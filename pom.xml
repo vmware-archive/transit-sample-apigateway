@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.pivotal.cf.mobile.ats</groupId>
+		<artifactId>ats-app</artifactId>
+		<version>0.0.1.W8</version>
+	</parent>
+
+	<groupId>org.cfms.api.nextbus.ttc</groupId>
+	<artifactId>nextbus-ttc-mobile</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<properties>
+		<start-class>org.cfms.api.nextbus.ttc.Application</start-class>
+		<cf.target>[your cloudfoundry api target eg https://api.one.pepsi.cf-app.com]</cf.target>
+		<cf.org>[your cloudfoundry org]</cf.org>
+		<cf.space>[your cloudfoundry space within your org]</cf.space>
+		<cf.appname>nextbus-ttc-mobile</cf.appname>
+		<cf.url>[the url of your app on cloudfoundry]</cf.url>
+		<cf.memory>256</cf.memory>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	<repositories>
+		<repository>
+			<id>maven.xtremelabs.com</id>
+			<url>https://maven.xtremelabs.com/artifactory/repo</url>
+		</repository>
+	</repositories>
+</project>
