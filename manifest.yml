@@ -1,7 +1,9 @@
 ---
 applications:
- - name: nextbus-ttc-mobile
-   memory: 256M
+ - name: Transit Gateway App
+   memory: 512M
    instances: 1
    buildpack: https://github.com/spring-io/java-buildpack
-   path: target/nextbus-ttc-mobile-1.0-SNAPSHOT-runnable.jar
+   path: target/transit-gateway-app-1.0-SNAPSHOT-runnable.jar
+   services:
+    - transit-gateway-dashboard

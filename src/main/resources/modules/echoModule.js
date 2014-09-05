@@ -1,6 +1,6 @@
+var echoFunction = function(someValue) {
+  return { "echo" : someValue };
+};
 module.exports = {
-		echo : function(req,res,someValue) {
-			res.setStatus(200);
-			res.setBody({ "echo" : someValue });
-		}
+  echo : echoFunction
 };

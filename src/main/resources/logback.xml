@@ -8,11 +8,10 @@
 	overrides, e.g:
 
 	<include resource="logging/logback-base.xml"/>
-	<logger name="com.pivotal.cf.mobile" level="DEBUG"/>
+	<logger name="com.pivotal.mss.apigateway" level="DEBUG"/>
 	...
 
     -->
 	<include resource="logging/logback-base.xml"/>
-	<logger name="com.pivotal.cf.mobile" level="DEBUG"/>
-	<logger name="org.cfms.api.nextbus.ttc.nextbus-ttc-mobile.jsmodule." level="DEBUG"/>
+	<logger name="com.pivotal.transit-gateway-app.jsmodule." level="INFO"/>
 </configuration>
