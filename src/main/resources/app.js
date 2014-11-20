@@ -19,6 +19,24 @@ appRouter.get("/routes", function(req, res) {
   res.setBody(routes);
 });
 
+appRouter.get("/service_alerts", function(req, res) {
+  var routes = http.get("http://www.ttc.ca/RSS/Service_Alerts/index.rss").then(handleXMLResponse);
+
+  function handleXMLResponse(response) {
+    var parsedObject  = XML.parse(response.body);
+
+    var alerts ={alerts: []}
+
+    _.map(parsedObject.item, function(item) {
+      alerts.alerts.push(item)
+    });;
+
+    return alerts;
+  }
+
+  res.setBody(routes);
+});
+
 appRouter.get("/routes/:id", function(req, res, id) {
   var routes = http.get("http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=ttc&r=" + id).then(handleXMLResponse);
 
