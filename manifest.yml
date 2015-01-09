@@ -1,7 +1,7 @@
 ---
 applications:
  - name: transit-gateway-app
-   memory: 512M
+   memory: 1G
    instances: 1
    buildpack: https://github.com/spring-io/java-buildpack
    path: target/transit-gateway-app-1.0-SNAPSHOT-runnable.jar
