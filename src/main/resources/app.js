@@ -1,7 +1,6 @@
 var Router = require("Router");
 var http = require("http")();
 var _ = require("lodash");
-var when = require("when");
 var XML = require('XML');
 var appRouter = new Router();
 
