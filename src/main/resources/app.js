@@ -18,6 +18,30 @@ appRouter.get("/routes", function(req, res) {
   res.setBody(routes);
 });
 
+
+appRouter.get("/routes/:id", function(req, res, id) {
+  var routes = http.get("http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=ttc&r=" + id).then(handleXMLResponse);
+
+  function handleXMLResponse(response) {
+    var parsedObject  = XML.parse(response.body);
+
+    var route = {stops: []};
+
+    _.each(parsedObject.route.stop, function(stop) {
+      route.stops.push({
+        "tag": stop["@tag"],
+        "title": stop["@title"],
+        "stopId": stop["@stopId"]
+      });
+    });
+
+    return route;
+  }
+
+  res.setBody(routes);
+});
+
+
 appRouter.get("/service_alerts", function(req, res) {
   var routes = http.get("http://www.ttc.ca/RSS/Service_Alerts/index.rss").then(handleXMLResponse);
 
@@ -36,67 +60,6 @@ appRouter.get("/service_alerts", function(req, res) {
   res.setBody(routes);
 });
 
-appRouter.get("/routes/:id", function(req, res, id) {
-  var routes = http.get("http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=ttc&r=" + id).then(handleXMLResponse);
-
-  function handleXMLResponse(response) {
-    var parsedObject  = XML.parse(response.body);
-
-    var route = {stops: []};
-  
-    _.each(parsedObject.route.stop, function(stop) {
-      route.stops.push({
-        "tag": stop["@tag"],
-        "title": stop["@title"],
-        "stopId": stop["@stopId"]
-      });
-    });
-
-    return route;
-  }
-
-  res.setBody(routes);
-});
-
-appRouter.get("/predictions/stop/:stopId", function(req, res, stopId) {
-  var predictions = http.get("http://webservices.nextbus.com/service/publicXMLFeed?command=predictions&a=ttc&stopId=" + stopId).then(handleXMLResponse);
-
-  function handleXMLResponse(response) {
-    var parsedObject  = XML.parse(response.body);
-
-    var predictions = {directions: []};
-  
-    _.each(parsedObject.predictions, function(prediction) {
-      var newDirection = {
-        "title": prediction["@dirTitleBecauseNoPredictions"] || prediction.direction["@title"],
-        "predictions": []
-      };
-
-      if (newDirection.title == null) {
-        console.log(JSON.stringify(prediction));
-      }
-
-      _.each(prediction.direction, function(predictions) {
-        if (!_.isString(predictions)) {
-          predictions = _.flatten([predictions]);
-          _.each(predictions, function(prediction) {
-            newDirection.predictions.push({
-              "time": prediction["@epochTime"],
-              "minutes": prediction["@minutes"],
-              "seconds": prediction["@seconds"]
-            });
-          });
-        }
-      });
-
-      predictions.directions.push(newDirection);
-    });
-
-    return predictions;
-  }
-
-  res.setBody(predictions);
-});
 
 appRouter.get("/predictions/stop/:stopId/route/:routeId", function(req, res, stopId, routeId) {
   var predictions = http.get("http://webservices.nextbus.com/service/publicXMLFeed?command=predictions&a=ttc&stopId=" + stopId + "&routeTag=" + routeId).then(handleXMLResponse);
@@ -105,39 +68,52 @@ appRouter.get("/predictions/stop/:stopId/route/:routeId", function(req, res, sto
     var parsedObject  = XML.parse(response.body);
 
     var predictions = {directions: []};
-  
-    _.each(parsedObject.predictions, function(prediction) {
-      if (_.isString(prediction)) {
-        return;
+
+    if(!_.isObject(parsedObject.predictions) || !_.isObject(parsedObject.predictions.direction)){
+      return;
+    }
+
+    var parsedDirections = parsedObject.predictions.direction;
+
+    if (!_.isArray(parsedDirections)) {
+     parsedDirections = [parsedDirections];
+    }
+    
+    _.each(parsedDirections, function(direction) {
+    if (!_.isObject(direction) || !_.isObject(direction.prediction)) {
+      return;
+    }
+
+    var newDirection = {
+      "title": direction["@routeTitle"] || direction["@dirTitleBecauseNoPredictions"] || direction["@title"],
+      "predictions": []
+    };
+
+
+    if (!_.isArray(direction.prediction)) {
+      direction.prediction = [direction.prediction];
+    }
+
+    _.each(direction.prediction, function(prediction) {
+      if (!prediction["@epochTime"]) {
+        console.log(prediction);
+      } else {
+        console.log("epoch time is " + prediction["@epochTime"]);
       }
-
-      var newDirection = {
-        "title": prediction["@routeTitle"] || prediction["@dirTitleBecauseNoPredictions"] || prediction["@title"],
-        "predictions": []
-      };
-
-      if (!_.isString(prediction)) {
-        _.each(prediction.prediction, function(prediction) {
-            if (!prediction["@epochTime"]) {
-              console.log(prediction);
-            } else {
-              console.log("epoch time is " + prediction["@epochTime"]);
-            }
-            newDirection.predictions.push({
-              "time": prediction["@epochTime"],
-              "minutes": prediction["@minutes"],
-              "seconds": prediction["@seconds"]
-            });
-        });
-      }
-
-      predictions.directions.push(newDirection);
+      newDirection.predictions.push({
+        "time": prediction["@epochTime"],
+        "minutes": prediction["@minutes"],
+        "seconds": prediction["@seconds"]
+      });
     });
 
-    return predictions;
-  }
+    predictions.directions.push(newDirection);
+  });
 
-  res.setBody(predictions);
+   return predictions;
+ }
+
+ res.setBody(predictions);
 });
 
 
